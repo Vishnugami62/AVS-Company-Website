@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-head: "Century Gothic";
+  --font-body: "Calibri";
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply font-head text-navy;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+  }
+  ::selection {
+    background: #e2bf72;
+    color: #0e1d45;
+  }
+  :focus-visible {
+    outline: 3px solid #c99a3e;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-shell px-5 sm:px-8;
+  }
+  .eyebrow {
+    @apply inline-block font-head text-xs font-bold uppercase tracking-[0.18em] text-gold-text;
+  }
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-pill font-head text-[13.5px] font-bold uppercase tracking-wide transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+    min-height: 46px;
+    padding: 0 26px;
+  }
+  .btn-gold {
+    @apply bg-gold-gradient text-navy-deep shadow-soft hover:-translate-y-0.5 hover:shadow-lift;
+  }
+  .btn-navy {
+    @apply bg-navy text-white hover:bg-navy-700;
+  }
+  .btn-outline {
+    @apply border-2 border-navy/20 bg-white/60 text-navy hover:border-navy/40 hover:bg-white;
+  }
+  .btn-ghost {
+    @apply text-navy hover:bg-navy/5;
+  }
+  .btn-whatsapp {
+    @apply bg-whatsapp text-white hover:brightness-110;
+  }
+  .btn-sm {
+    min-height: 38px;
+    padding: 0 18px;
+    @apply text-[12px];
+  }
+  .card {
+    @apply rounded-card border border-black/5 bg-paper shadow-card;
+  }
+  .field-label {
+    @apply mb-1.5 block font-head text-[13px] font-bold text-navy;
+  }
+  .field {
+    @apply w-full rounded-xl border border-navy/15 bg-white px-4 py-3 text-[15px] text-ink outline-none transition placeholder:text-muted/60 focus:border-gold focus:ring-2 focus:ring-gold/30;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill border border-navy/10 bg-white px-3 py-1.5 text-[13px] font-medium text-navy;
+  }
+  .link-arrow {
+    @apply inline-flex items-center gap-1 font-head text-[13px] font-bold uppercase tracking-wide text-gold-text transition hover:gap-2;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Thin, on-brand scrollbars for admin tables */
+.scroll-slim::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: rgba(19, 39, 90, 0.22);
+  border-radius: 999px;
+}

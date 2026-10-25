@@ -1,0 +1,270 @@
+// AVS Company — data model
+// Dev uses SQLite (file-based, zero setup). For production, switch `provider`
+// to "postgresql" and point DATABASE_URL at a managed Postgres instance.
+// NOTE: SQLite has no native enum/json/decimal types, so we store those as
+// validated strings (see src/lib/constants.ts) and money as integer paise.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Staff / authentication
+// ---------------------------------------------------------------------------
+model Staff {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STAFF") // OWNER | ADMIN | STAFF
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orderEvents     OrderEvent[]
+  activityLogs    ActivityLog[]
+  deliveryReplies DeliveryRequest[]
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue
+// ---------------------------------------------------------------------------
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  tagline     String?
+  description String?
+  icon        String? // lucide icon name
+  sortOrder   Int       @default(0)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  sku            String   @unique
+  slug           String   @unique
+  name           String
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  shortDesc      String?
+  description    String?
+  specsJson      String? // JSON: [{label,value}]
+  packInfo       String? // e.g. "Ream of 500 · MOQ 10"
+  unit           String? // e.g. "ream", "box"
+  moq            String?
+  hsnCode        String?
+  gstRate        Int? // percent
+  badge          String? // BESTSELLER | ECO | null
+  priceOnRequest Boolean  @default(false)
+  imageUrl       String?
+  galleryJson    String? // JSON: [url, ...]
+  sortOrder      Int      @default(0)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  priceSlabs PriceSlab[]
+
+  @@index([categoryId])
+}
+
+model PriceSlab {
+  id           String  @id @default(cuid())
+  productId    String
+  product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  minQty       Int
+  maxQty       Int? // null = and above
+  pricePaise   Int? // null = "best quote — talk to us"
+  savingsLabel String?
+  sortOrder    Int     @default(0)
+
+  @@index([productId])
+}
+
+// ---------------------------------------------------------------------------
+// Customers & orders
+// ---------------------------------------------------------------------------
+model Customer {
+  id          String   @id @default(cuid())
+  company     String
+  contactName String?
+  email       String?
+  phone       String?
+  gstin       String?
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+
+  @@index([company])
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  avsNumber       String   @unique // e.g. AVS-2610-0042
+  poNumber        String? // customer PO
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  receivedVia     String   @default("WEBSITE") // WEBSITE|WHATSAPP|PHONE|EMAIL|IN_PERSON
+  status          String   @default("CONFIRMED") // see constants ORDER_STATUSES
+  deliveryType    String   @default("STANDARD") // STANDARD|SCHEDULED|URGENT|PARTIAL
+  expectedDate    DateTime?
+  expectedSlot    String?
+  deliveryAddress String?
+  trackingEmail   String // updates & OTP go here
+  itemsSummary    String?
+  amountPaise     Int?
+  poFilePath      String?
+  onHold          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  events           OrderEvent[]
+  activityLogs     ActivityLog[]
+  deliveryRequests DeliveryRequest[]
+
+  @@index([poNumber])
+  @@index([status])
+}
+
+// Public-facing status timeline
+model OrderEvent {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status      String
+  note        String?
+  isAutomatic Boolean  @default(false)
+  staffId     String?
+  staff       Staff?   @relation(fields: [staffId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// Internal admin audit log
+model ActivityLog {
+  id        String   @id @default(cuid())
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorType String   @default("STAFF") // STAFF | SYSTEM
+  staffId   String?
+  staff     Staff?   @relation(fields: [staffId], references: [id])
+  action    String
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model DeliveryRequest {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type          String // SCHEDULE | PARTIAL | URGENT
+  status        String   @default("WAITING") // WAITING|APPROVED|DECLINED|SLOT_SUGGESTED
+  requestedDate DateTime?
+  requestedSlot String?
+  details       String?
+  customerNote  String?
+  emailVerified Boolean  @default(false)
+  suggestedDate DateTime?
+  suggestedSlot String?
+  staffReply    String?
+  staffId       String?
+  staff         Staff?   @relation(fields: [staffId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([status])
+}
+
+// One-time email codes (hashed) for verifying delivery-change requests
+model OtpCode {
+  id         String   @id @default(cuid())
+  email      String
+  codeHash   String
+  purpose    String   @default("DELIVERY_REQUEST")
+  orderId    String?
+  payloadJson String? // pending request to apply once verified
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// Quote requests, contact messages, emails, settings
+// ---------------------------------------------------------------------------
+model QuoteRequest {
+  id                String   @id @default(cuid())
+  refNumber         String   @unique // AVS-0001
+  categoriesJson    String? // JSON array
+  listText          String?
+  frequency         String? // ONE_TIME|WEEKLY|MONTHLY|QUARTERLY
+  deliveryLocations String?
+  requiredBy        DateTime?
+  budget            String?
+  customPrint       Boolean  @default(false)
+  separateInvoice   Boolean  @default(false)
+  fullName          String
+  company           String
+  email             String
+  phone             String
+  gstin             String?
+  hearAbout         String?
+  whatsappOptin     Boolean  @default(false)
+  emailOptin        Boolean  @default(false)
+  fileName          String?
+  filePath          String?
+  status            String   @default("NEW") // NEW|QUOTED|WON|LOST
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  company   String?
+  email     String
+  phone     String?
+  interest  String?
+  message   String
+  handled   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  toEmail   String
+  subject   String
+  template  String?
+  orderId   String?
+  bodyText  String?
+  status    String   @default("SENT") // SENT|LOGGED|FAILED
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// Editable site settings (contact details, thresholds, etc.)
+model Setting {
+  key       String   @id
+  value     String?
+  updatedAt DateTime @updatedAt
+}

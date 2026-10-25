@@ -30,6 +30,9 @@ yarn-error.log*
 /prisma/*.db-journal
 /prisma/dev.db*
 
+# generated at build time from schema.prisma (see scripts/make-prod-schema.mjs)
+/prisma/schema.prod.prisma
+
 # uploads (local dev storage)
 /uploads/*
 !/uploads/.gitkeep

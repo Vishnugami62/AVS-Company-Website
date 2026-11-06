@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/public/Reveal";
 import { IsoHero } from "@/components/art/IsoHero";
-import { IconBadge } from "@/components/public/CategoryIcon";
+import { IsoTile } from "@/components/art/IsoTile";
 import { CATEGORIES } from "@/lib/catalogue-data";
 import { MUMBAI_HUBS } from "@/lib/constants";
 
@@ -141,7 +141,7 @@ export default function HomePage() {
                   href={`/catalogue/${c.slug}`}
                   className="group flex h-full flex-col rounded-card border border-black/5 bg-paper p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lift"
                 >
-                  <IconBadge icon={c.icon} />
+                  <IsoTile icon={c.icon} />
                   <h3 className="mt-4 text-xl font-bold">{c.name}</h3>
                   <p className="mt-2 flex-1 text-[15px] text-muted">{c.blurb}</p>
                   <span className="link-arrow mt-4">
@@ -204,7 +204,7 @@ export default function HomePage() {
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 70}>
                 <div className="relative h-full rounded-card border border-black/5 bg-paper p-6 shadow-card">
-                  <span className="font-head text-4xl font-bold text-gold/35">{s.n}</span>
+                  <IsoTile num={s.n} />
                   <h3 className="mt-2 text-lg font-bold">{s.title}</h3>
                   <p className="mt-1.5 text-[15px] text-muted">{s.body}</p>
                 </div>

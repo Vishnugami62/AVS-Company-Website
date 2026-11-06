@@ -169,3 +169,45 @@
 @media (prefers-reduced-motion: reduce) {
   .iso-world, .cub { animation: none !important; }
 }
+
+/* ===== Small isometric tile (cards, steps) ===== */
+.iso-tile {
+  perspective: 600px;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 66px;
+}
+.iso-tile-world {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  transform-style: preserve-3d;
+  transform: rotateX(60deg) rotateZ(-45deg);
+  transition: transform 260ms var(--ease-out);
+}
+.iso-tile .cub { animation: none; }
+.iso-tile { position: relative; }
+.iso-tile-glyph {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.iso-tile-glyph svg { width: 19px; height: 19px; color: #0E1D45; }
+.iso-tile-glyph .num {
+  font-family: var(--font-head), "Century Gothic", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #0E1D45;
+}
+.group:hover .iso-tile-world,
+.iso-tile-world.hoverable:hover {
+  transform: rotateX(58deg) rotateZ(-30deg) translateZ(12px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .iso-tile-world { transition: none; }
+}

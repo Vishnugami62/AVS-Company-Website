@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Download, Search } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { IconBadge } from "@/components/public/CategoryIcon";
+import { IsoTile } from "@/components/art/IsoTile";
 import { Button } from "@/components/ui/Button";
 import { CATEGORIES } from "@/lib/catalogue-data";
 
@@ -30,7 +30,7 @@ export default function CatalogueOverviewPage() {
           {CATEGORIES.map((c) => (
             <div key={c.slug} className="flex h-full flex-col rounded-card border border-black/5 bg-paper p-6 shadow-card">
               <div className="flex items-center gap-3">
-                <IconBadge icon={c.icon} />
+                <IsoTile icon={c.icon} />
                 <h2 className="text-xl font-bold">{c.name}</h2>
               </div>
               <ul className="mt-4 flex-1 space-y-1.5 text-[15px] text-muted">

@@ -28,7 +28,7 @@ export function SectionHeading({
       )}
       <h2
         className={cn(
-          "mt-2 text-3xl font-bold sm:text-4xl",
+          "mt-2 font-bold text-[clamp(1.75rem,4vw,36px)]",
           tone === "light" && "text-white",
         )}
       >

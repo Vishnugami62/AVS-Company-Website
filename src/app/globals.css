@@ -38,7 +38,7 @@
 
 @layer components {
   .shell {
-    @apply mx-auto w-full max-w-shell px-5 sm:px-8;
+    @apply mx-auto w-full max-w-shell px-5 sm:px-8 lg:px-16;
   }
   .eyebrow {
     @apply inline-block font-head text-xs font-bold uppercase tracking-[0.18em] text-gold-text;
@@ -103,4 +103,69 @@
 .scroll-slim::-webkit-scrollbar-thumb {
   background: rgba(19, 39, 90, 0.22);
   border-radius: 999px;
+}
+
+/* ===== Motion tokens (strong curves, UI stays under 300ms) ===== */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* ===== True 3D isometric scene (navy & gold, per style guide) ===== */
+.iso-stage {
+  perspective: 1500px;
+  perspective-origin: 50% 50%;
+}
+.iso-world {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(60deg + var(--my, 0deg))) rotateZ(calc(-45deg + var(--mx, 0deg)));
+  animation: iso-sway 16s ease-in-out infinite;
+}
+@keyframes iso-sway {
+  0%, 100% { transform: rotateX(calc(61deg + var(--my,0deg))) rotateZ(calc(-48deg + var(--mx,0deg))); }
+  50%      { transform: rotateX(calc(57deg + var(--my,0deg))) rotateZ(calc(-41deg + var(--mx,0deg))); }
+}
+
+/* A cuboid: top + two visible sides, sized by --w (width) --d (depth) --h (height) */
+.cub {
+  position: absolute;
+  transform-style: preserve-3d;
+  width: var(--w);
+  height: var(--d);
+  animation: iso-rise 7s ease-in-out infinite;
+}
+.cub > i {
+  position: absolute;
+  display: block;
+}
+.cub .ft {
+  width: var(--w); height: var(--d);
+  transform: translateZ(var(--h));
+  background: linear-gradient(135deg, #EFD79B 0%, #E2BF72 45%, #C99A3E 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.cub .fs {
+  width: var(--w); height: var(--h);
+  top: 100%; left: 0;
+  transform-origin: top left;
+  transform: rotateX(90deg);
+  background: linear-gradient(180deg, #24417F 0%, #13275A 100%);
+}
+.cub .fe {
+  width: var(--h); height: var(--d);
+  left: 100%; top: 0;
+  transform-origin: left top;
+  transform: rotateY(-90deg);
+  background: linear-gradient(90deg, #13275A 0%, #0E1D45 100%);
+}
+.cub.sheet .ft { background: linear-gradient(135deg, #FFFCF6 0%, #F6F0E4 100%); }
+.cub.sheet .fs, .cub.sheet .fe { background: #E6DCC6; }
+@keyframes iso-rise {
+  0%, 100% { transform: translateZ(var(--z, 0px)); }
+  50%      { transform: translateZ(calc(var(--z, 0px) + 9px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iso-world, .cub { animation: none !important; }
 }

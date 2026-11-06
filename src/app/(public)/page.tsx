@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/public/Reveal";
-import { HeroArt } from "@/components/art/HeroArt";
+import { IsoHero } from "@/components/art/IsoHero";
 import { IconBadge } from "@/components/public/CategoryIcon";
 import { CATEGORIES } from "@/lib/catalogue-data";
 import { MUMBAI_HUBS } from "@/lib/constants";
@@ -73,7 +73,7 @@ export default function HomePage() {
         <div className="shell grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
           <Reveal>
             <span className="eyebrow">Single-source corporate supplies</span>
-            <h1 className="mt-3 text-4xl font-bold leading-[1.05] sm:text-5xl xl:text-6xl">
+            <h1 className="mt-3 font-bold leading-[1.05] text-[clamp(2.25rem,6vw,52px)]">
               Your office,
               <br />
               <span className="text-gold-text">fully supplied</span>
@@ -99,12 +99,15 @@ export default function HomePage() {
 
           <Reveal delay={120} className="relative">
             <div className="relative mx-auto max-w-md">
-              <HeroArt className="w-full drop-shadow-xl" />
-              <div className="absolute -left-2 top-6 chip shadow-soft">
-                <PackageCheck className="h-4 w-4 text-gold" /> 500+ products
+              <IsoHero />
+              <div className="absolute left-0 top-8 chip shadow-soft">
+                <PackageCheck className="h-4 w-4 text-gold" /> Office Stationery
               </div>
-              <div className="absolute -right-1 bottom-10 chip shadow-soft">
-                <CalendarClock className="h-4 w-4 text-gold" /> 24 h quote
+              <div className="absolute -right-2 top-1/2 chip shadow-soft">
+                <CalendarClock className="h-4 w-4 text-gold" /> Housekeeping
+              </div>
+              <div className="absolute bottom-10 left-4 chip shadow-soft">
+                <Boxes className="h-4 w-4 text-gold" /> Bulk Materials
               </div>
             </div>
           </Reveal>
